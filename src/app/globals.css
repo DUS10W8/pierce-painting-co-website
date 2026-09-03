@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --color-forest: #005b3c;
+  --color-forest-dark: #003f29;
+  --color-orange: #ff5a00;
+  --color-orange-dark: #d94b00;
+  --color-cream: #fff9ed;
+  --color-cream-soft: #fffdf8;
+  --color-charcoal: #23281f;
+}
+
+@theme inline {
+  --color-forest: var(--color-forest);
+  --color-forest-dark: var(--color-forest-dark);
+  --color-orange: var(--color-orange);
+  --color-orange-dark: var(--color-orange-dark);
+  --color-cream: var(--color-cream);
+  --color-cream-soft: var(--color-cream-soft);
+  --color-charcoal: var(--color-charcoal);
+  --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Visible focus states everywhere, keyboard-only */
+:focus-visible {
+  outline: 3px solid var(--color-orange);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--color-forest);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 0.5rem 0;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* Paint-stroke reveal for headings */
+.paint-reveal {
+  position: relative;
+  display: inline-block;
+}
+
+.paint-reveal::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.22em;
+  width: 64px;
+  height: 5px;
+  background: var(--color-orange);
+  border-radius: 3px;
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.5s ease;
+}
+
+.paint-reveal.is-revealed::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paint-reveal::after {
+    transition: none;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
