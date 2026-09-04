@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
  * IMPORTANT — before launch: this currently only validates and logs the
  * submission server-side. It does NOT send an email, text, or CRM entry
  * yet. Wire this up to a real provider (e.g. Resend, Postmark, or Zoho
- * Mail's SMTP once info@piercepaintingco.com is live) before relying on
+ * Mail's SMTP once info@piercepropainting.com is live) before relying on
  * it to actually reach the business.
  */
 export async function POST(request: NextRequest) {

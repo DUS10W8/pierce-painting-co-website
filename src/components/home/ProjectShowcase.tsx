@@ -14,7 +14,7 @@ export default function ProjectShowcase() {
           <SectionHeading
             align="left"
             eyebrow="Recent Work"
-            title="A look at real Pierce Painting projects"
+            title="A look at real Pierce Pro Painting projects"
           />
           <Link href="/gallery" className="text-sm font-bold text-orange-dark hover:underline">
             View the full gallery →

@@ -13,14 +13,14 @@
  */
 
 export const siteConfig = {
-  businessName: "Pierce Painting Co.",
-  shortName: "Pierce Painting",
+  businessName: "Pierce Pro Painting LLC",
+  shortName: "Pierce Pro Painting",
   tagline: "Tri-Cities painting, done with care.",
   description:
-    "Pierce Painting Co. is a locally owned painting contractor serving Kennewick, Richland, Pasco, and Benton City, Washington. Interior, exterior, cabinet, and commercial painting with careful preparation and clear communication.",
+    "Pierce Pro Painting LLC is a locally owned painting contractor serving Kennewick, Richland, Pasco, and Benton City, Washington. Interior, exterior, cabinet, and commercial painting with careful preparation and clear communication.",
 
   // PLACEHOLDER: update once the production domain is live and deployed.
-  siteUrl: "https://www.piercepaintingco.com",
+  siteUrl: "https://www.piercepropainting.com",
 
   phone: {
     display: "(509) 802-4309",
@@ -28,12 +28,12 @@ export const siteConfig = {
   },
 
   // PLACEHOLDER: mailbox does not exist yet (pending domain + Zoho Mail setup).
-  // Update once info@piercepaintingco.com is live, or remove this field from
+  // Update once info@piercepropainting.com is live, or remove this field from
   // any component that renders it if the business prefers phone-only contact
   // until then.
   email: {
-    display: "info@piercepaintingco.com",
-    href: "mailto:info@piercepaintingco.com",
+    display: "info@piercepropainting.com",
+    href: "mailto:info@piercepropainting.com",
     isPlaceholder: true,
   },
 

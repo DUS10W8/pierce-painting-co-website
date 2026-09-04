@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/site-config";
 export const metadata: Metadata = {
   title: "Request a Free Estimate",
   description:
-    "Request a free painting estimate from Pierce Painting Co., serving Kennewick, Richland, Pasco, and Benton City, WA.",
+    "Request a free painting estimate from Pierce Pro Painting LLC, serving Kennewick, Richland, Pasco, and Benton City, WA.",
   alternates: { canonical: `${siteConfig.siteUrl}/contact` },
 };
 

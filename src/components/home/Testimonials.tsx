@@ -20,7 +20,7 @@ export default function Testimonials() {
               <Image src="/assets/pierce-testimonial-quote-graphic.png" alt="" fill className="object-contain" />
             </span>
             <p className="text-charcoal/70">
-              Reviews are coming soon — we&rsquo;re just getting Pierce Painting Co.&rsquo;s online
+              Reviews are coming soon — we&rsquo;re just getting Pierce Pro Painting LLC&rsquo;s online
               presence started. Check back after a few projects wrap up.
             </p>
           </div>

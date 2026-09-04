@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Project Gallery",
-  description: "Real Pierce Painting Co. projects across the Tri-Cities, filterable by category.",
+  description: "Real Pierce Pro Painting LLC projects across the Tri-Cities, filterable by category.",
   alternates: { canonical: `${siteConfig.siteUrl}/gallery` },
 };
 

@@ -7,7 +7,7 @@ export default function TrustBadges() {
   return (
     <section className="py-20 sm:py-24" aria-labelledby="trust-heading">
       <Container>
-        <SectionHeading eyebrow="Why Pierce Painting" title="What you can count on" />
+        <SectionHeading eyebrow="Why Pierce Pro Painting" title="What you can count on" />
         <ul className="mt-12 grid gap-6 sm:grid-cols-3">
           {trustBadges.map((badge) => (
             <li
