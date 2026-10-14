@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
@@ -75,6 +76,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         <Footer />
         <StickyEstimateButton />
+        {/* Vercel Web Analytics (page views). Requires Analytics enabled for this project in Vercel. */}
+        <Script id="vercel-analytics-queue" strategy="afterInteractive">
+          {`window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };`}
+        </Script>
+        <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />
       </body>
     </html>
   );
