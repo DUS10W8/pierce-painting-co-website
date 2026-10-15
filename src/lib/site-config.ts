@@ -27,14 +27,10 @@ export const siteConfig = {
     href: "tel:+15098024309",
   },
 
-  // PLACEHOLDER: mailbox does not exist yet (pending domain + Zoho Mail setup).
-  // Update once info@piercepropainting.com is live, or remove this field from
-  // any component that renders it if the business prefers phone-only contact
-  // until then.
   email: {
-    display: "info@piercepropainting.com",
-    href: "mailto:info@piercepropainting.com",
-    isPlaceholder: true,
+    display: "pierce@piercepropainting.com",
+    href: "mailto:pierce@piercepropainting.com",
+    isPlaceholder: false,
   },
 
   social: {

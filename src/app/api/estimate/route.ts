@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendMail } from "@/lib/smtp";
 
 /**
  * Estimate request submission endpoint.
  *
- * Delivers each request by email through Resend's HTTP API (no extra
- * packages). Success is returned ONLY after the email provider accepts the
- * message, so customers are never told "your request is in" when it wasn't
- * delivered.
+ * Delivers each request by email through Pierce's existing Zoho mailbox
+ * (SMTP, no extra services or packages). Success is returned ONLY after the
+ * mail server accepts the message, so customers are never told "your request
+ * is in" when it wasn't sent.
  *
- * Required environment variables (set in Vercel → Settings → Environment
- * Variables, Production):
- *   RESEND_API_KEY      API key from resend.com (domain piercepropainting.com verified)
- *   ESTIMATE_TO_EMAIL   inbox that receives requests, e.g. info@piercepropainting.com
- *   ESTIMATE_FROM_EMAIL sender on the verified domain, e.g. estimates@piercepropainting.com
+ * Environment variables (Vercel → Settings → Environment Variables, Production):
+ *   SMTP_USER          pierce@piercepropainting.com
+ *   SMTP_PASS          a Zoho *app password* for that mailbox (not the login password)
+ *   ESTIMATE_TO_EMAIL  optional; defaults to SMTP_USER
+ *   SMTP_HOST          optional; defaults to smtp.zoho.com
+ *   SMTP_PORT          optional; defaults to 465
  *
- * If any are missing, the endpoint fails honestly and asks the customer to
- * call or text instead.
+ * If SMTP_USER or SMTP_PASS is missing, the endpoint fails honestly and asks
+ * the customer to call or text instead.
  */
+
+export const runtime = "nodejs";
 
 const CALL_TEXT_FALLBACK =
   "We couldn't send your request online. Please call or text (509) 802-4309 and we'll get you an estimate.";
@@ -24,10 +28,6 @@ const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
 function field(fd: FormData, key: string): string {
   return String(fd.get(key) ?? "").trim().slice(0, 2000);
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
 export async function POST(request: NextRequest) {
@@ -44,13 +44,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Name and phone are required." }, { status: 400 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.ESTIMATE_TO_EMAIL;
-  const from = process.env.ESTIMATE_FROM_EMAIL;
-  if (!apiKey || !to || !from) {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) {
     console.error("[estimate-request] delivery not configured; request NOT delivered");
     return NextResponse.json({ ok: false, error: CALL_TEXT_FALLBACK }, { status: 503 });
   }
+  const to = process.env.ESTIMATE_TO_EMAIL || user;
 
   const rows: [string, string][] = [
     ["Name", name],
@@ -63,49 +63,50 @@ export async function POST(request: NextRequest) {
     ["Timeframe", field(formData, "timeframe")],
     ["Notes", field(formData, "notes")],
   ];
-  const filled = rows.filter(([, v]) => v);
 
-  const attachments: { filename: string; content: string }[] = [];
-  const photo = formData.get("photo");
+  const attachments: { filename: string; contentType: string; content: Buffer }[] = [];
   let photoNote = "";
+  const photo = formData.get("photo");
   if (photo && typeof photo === "object" && "arrayBuffer" in photo) {
     const file = photo as File;
     if (file.size > 0 && file.size <= MAX_PHOTO_BYTES) {
-      const buf = Buffer.from(await file.arrayBuffer());
-      attachments.push({ filename: file.name || "photo.jpg", content: buf.toString("base64") });
+      attachments.push({
+        filename: file.name || "photo.jpg",
+        contentType: file.type || "application/octet-stream",
+        content: Buffer.from(await file.arrayBuffer()),
+      });
     } else if (file.size > MAX_PHOTO_BYTES) {
       photoNote = "Customer attached a photo larger than 5 MB; ask them to text it.";
     }
   }
 
-  const text = [...filled.map(([k, v]) => `${k}: ${v}`), photoNote].filter(Boolean).join("\n");
-  const html =
-    `<h2>New estimate request</h2><table>` +
-    filled.map(([k, v]) => `<tr><td><b>${escapeHtml(k)}</b></td><td>${escapeHtml(v)}</td></tr>`).join("") +
-    `</table>` +
-    (photoNote ? `<p>${escapeHtml(photoNote)}</p>` : "");
+  const text =
+    "New estimate request from piercepropainting.com\n\n" +
+    rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join("\n") +
+    (photoNote ? `\n\n${photoNote}` : "") +
+    "\n\nReply to this email to answer the customer (if they gave an email), or call/text them.";
 
   const email = field(formData, "email");
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: [to],
+    await sendMail(
+      {
+        host: process.env.SMTP_HOST || "smtp.zoho.com",
+        port: Number(process.env.SMTP_PORT || 465),
+        user,
+        pass,
+      },
+      {
+        from: user,
+        fromName: "Pierce Pro Painting Website",
+        to,
+        replyTo: /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email) ? email : undefined,
         subject: `Estimate request: ${name} (${field(formData, "projectType") || "painting"})`,
         text,
-        html,
-        ...(email.includes("@") ? { reply_to: email } : {}),
-        ...(attachments.length ? { attachments } : {}),
-      }),
-    });
-    if (!res.ok) {
-      console.error("[estimate-request] provider rejected", res.status);
-      return NextResponse.json({ ok: false, error: CALL_TEXT_FALLBACK }, { status: 502 });
-    }
-  } catch {
-    console.error("[estimate-request] provider unreachable");
+        attachments,
+      }
+    );
+  } catch (err) {
+    console.error("[estimate-request] SMTP send failed:", err instanceof Error ? err.message : "unknown");
     return NextResponse.json({ ok: false, error: CALL_TEXT_FALLBACK }, { status: 502 });
   }
 
